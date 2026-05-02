@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: brain-tumor-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 4 --worker-class sync --timeout 60 --bind 0.0.0.0:$PORT backend:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
+
+  - type: web
+    name: tumor-detector-app
+    runtime: docker
+    buildCommand: flutter pub get && flutter build web --release
+    startCommand: python -m http.server 8080 --directory build/web
+    routes:
+      - path: /
+        destination: index.html
